@@ -5,6 +5,7 @@ import org.apache.flink.api.scala.ExecutionEnvironment
 import org.apache.flink.streaming.api.datastream.DataStreamUtils
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.util.Collector
 import org.scalatest.FunSuite
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
@@ -59,6 +60,23 @@ class FlinkStudySuite extends FunSuite with Logging {
     }
     assume(output.collect().sortBy(_.count) equals
       Seq(WordCount("new_hello", 3),WordCount("new_dxy", 4)).sortBy(_.count))
+  }
+
+  test("reduceGroup 去重") {
+    val env = ExecutionEnvironment.createLocalEnvironment()
+    val input = env.fromElements(
+      WordCount("hello", 1),
+      WordCount("dxy", 2),
+      WordCount("wuheyi", 100),
+      WordCount("hello", 2),
+      WordCount("dxy", 2))
+    val output = input.groupBy(_.word).reduceGroup {
+      (in, out: Collector[WordCount]) => {
+        in.toSet[WordCount].foreach(out.collect(_))
+      }
+    }
+    assume(output.collect().sortBy(_.word) equals
+      Seq(WordCount("dxy", 2), WordCount("hello", 1), WordCount("hello", 2), WordCount("wuheyi", 100)).sortBy(_.word))
   }
 
 }
