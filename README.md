@@ -1,6 +1,13 @@
-# FLINK STUDY
+### flink study
 
-边看官网边写代码，
-记录比较重要的知识点
-主要代码在FlinkStudySuite.scala内
+* 阅读flink官方文档时敲下的代码
+* 部分代码在FlinkStudySuite.scala内
+
+
+### 跳过学习的内容
+* Rich functions
+* Accumulators & Counters
+* fromParallelCollection generateSequence
+* Iterations
+* CoGroup
 
