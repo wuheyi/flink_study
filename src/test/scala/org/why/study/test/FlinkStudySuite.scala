@@ -77,6 +77,65 @@ class FlinkStudySuite extends FunSuite with Logging {
     }
     assume(output.collect().sortBy(_.word) equals
       Seq(WordCount("dxy", 2), WordCount("hello", 1), WordCount("hello", 2), WordCount("wuheyi", 100)).sortBy(_.word))
+
+    import org.apache.flink.api.common.operators.Order
+    val output2 = input.groupBy(_.word).sortGroup(_.count, Order.ASCENDING).reduceGroup {
+      (in, out: Collector[WordCount]) => {
+        var prev: WordCount = null
+        for (t <- in) {
+          if (prev == null || prev != t)
+            out.collect(t)
+          prev = t
+        }
+      }
+    }
+    assume(output2.collect().sortBy(_.word) equals
+      Seq(WordCount("dxy", 2), WordCount("hello", 1), WordCount("hello", 2), WordCount("wuheyi", 100)).sortBy(_.word))
+
+  }
+
+  test("Aggregate maxBy sum min") {
+    val env = ExecutionEnvironment.createLocalEnvironment()
+    val input = env.fromElements(
+      ("hello", 1, 2),
+      ("dxy", 2, 3),
+      ("wuheyi", 100, 4),
+      ("hello", 2, 2),
+      ("dxy", 2, 6))
+    val output = input.groupBy(0, 2).sum(1).minBy(2)
+    assume(output.collect() equals Seq(("hello", 3, 2)))
+  }
+
+  /**
+   * flink 各个算子一般都支持下面四种方式
+   * a key expression
+   * a key-selector function
+   * one or more field position keys
+   * Case Class Fields
+   *
+   * 其他方式
+   * lambda
+   * 偏函数
+   */
+  test("distinct 举例") {
+    val env = ExecutionEnvironment.createLocalEnvironment()
+    val input = env.fromElements(
+      ("hello", 1, 2),
+      ("dxy", 2, 3),
+      ("wuheyi", 100, 4),
+      ("hello", 2, 2),
+      ("dxy", 2, 6))
+    input.distinct(0, 1).print()
+    input.distinct(x => (x._1, x._2)).print()
+    assume(input.distinct(0, 1).collect() sameElements input.distinct(x => (x._1, x._2)).collect())
+    val input2 = env.fromElements(
+      WordCount("hello", 1),
+      WordCount("dxy", 2),
+      WordCount("wuheyi", 100),
+      WordCount("hello", 2),
+      WordCount("dxy", 2))
+    // 按照word去重时，如果count不同，随机返回其中任意一个count
+    assume(input2.distinct("word").collect().size == 3)
   }
 
 }
