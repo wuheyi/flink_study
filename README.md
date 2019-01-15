@@ -8,6 +8,7 @@
 * Rich functions
 * Accumulators & Counters
 * fromParallelCollection generateSequence
-* Iterations
 * CoGroup
+* 学习 page rank 例子程序
+* Delta Iterate
 
