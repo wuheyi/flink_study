@@ -11,4 +11,7 @@
 * CoGroup
 * 学习 page rank 例子程序
 * Delta Iterate
+* 看完了Hadoop Compatibility Beta，不过后续需要了解使用场景
+* 水印需要再深入了解
+* Rescaling
 

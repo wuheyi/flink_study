@@ -1,10 +1,9 @@
-package org.why.study.test
+package org.why.study.test.dataset
 
 import grizzled.slf4j.Logging
 import org.apache.flink.api.scala.ExecutionEnvironment
 import org.apache.flink.streaming.api.datastream.DataStreamUtils
-import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.util.Collector
 import org.scalatest.FunSuite
 
@@ -136,6 +135,20 @@ class FlinkStudySuite extends FunSuite with Logging {
       WordCount("dxy", 2))
     // 按照word去重时，如果count不同，随机返回其中任意一个count
     assume(input2.distinct("word").collect().size == 3)
+  }
+
+  test("array_map_sort") {
+    val input = Array(
+      Map("aa" -> 1.1),
+      Map("bb" -> 0.1),
+      Map("cc" -> 6.1),
+      Map("aa" -> 4.1)
+    )
+    val output = input.flatMap(f => {
+      f.map(f => (f._1, f._2))
+    })
+    println(output.sortWith(_._2 > _._2).map(f => f._1 + f._2).distinct.mkString(","))
+
   }
 
 }

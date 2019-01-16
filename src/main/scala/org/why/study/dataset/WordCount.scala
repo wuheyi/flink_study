@@ -16,15 +16,11 @@
  * limitations under the License.
  */
 
-package org.why.study
+package org.why.study.dataset
 
-import org.apache.flink.api.common.functions.RichFlatMapFunction
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.api.scala._
 import org.apache.flink.core.fs.FileSystem.WriteMode
-import org.apache.flink.util.Collector
-import org.apache.flink.api.scala.extensions._
-import org.apache.flink.streaming.api.datastream.DataStreamUtils
 
 /**
  * Implements the "WordCount" program that computes a simple word occurrence histogram

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.why.study
+package org.why.study.dataset
 
 import org.apache.flink.api.scala._
 

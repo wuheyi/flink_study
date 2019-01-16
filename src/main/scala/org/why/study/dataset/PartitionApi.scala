@@ -1,4 +1,4 @@
-package org.why.study
+package org.why.study.dataset
 
 import org.apache.flink.api.common.operators.Order
 import org.apache.flink.api.scala.ExecutionEnvironment

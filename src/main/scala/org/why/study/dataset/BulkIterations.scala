@@ -1,4 +1,4 @@
-package org.why.study
+package org.why.study.dataset
 
 import org.apache.flink.api.scala.{DataSet, ExecutionEnvironment}
 import org.apache.flink.streaming.api.scala._

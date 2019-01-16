@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
-package org.why.study
+package org.why.study.datastream
 
-import org.apache.flink.api.java.utils.DataSetUtils
-import org.apache.flink.streaming.api.datastream.DataStreamUtils
+import java.util.Properties
+
+import org.apache.flink.api.common.serialization.SimpleStringSchema
+import org.apache.flink.api.java.utils.ParameterTool
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala._
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
 /**
  * Skeleton for a Flink Streaming Job.
@@ -37,28 +40,33 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
  */
 object StreamingJob {
   def main(args: Array[String]) {
-    // set up the streaming execution environment
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    // Checking input parameters
+    val params = ParameterTool.fromArgs(args)
 
-    /*
-     * Here, you can start creating your execution plan for Flink.
-     *
-     * Start with getting some data from the environment, like
-     *  env.readTextFile(textPath);
-     *
-     * then, transform the resulting DataStream[String] using operations
-     * like
-     *   .filter()
-     *   .flatMap()
-     *   .join()
-     *   .group()
-     *
-     * and many more.
-     * Have a look at the programming guide:
-     *
-     * http://flink.apache.org/docs/latest/apis/streaming/index.html
-     *
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    env.enableCheckpointing(5000)
+
+    val properties = new Properties()
+    properties.setProperty("bootstrap.servers", "localhost:9092")
+    properties.setProperty("group.id", "test")
+    val kafkaConsumer = new FlinkKafkaConsumer[String]("test", new SimpleStringSchema(), properties)
+
+
+    /**
+     * flink.partition-discovery.interval-millis 设置成非负值，动态发现分区
      */
+
+    /**
+     * 动态发现topic
+     */
+//    val kafkaConsumer = new FlinkKafkaConsumer[String](
+//      java.util.regex.Pattern.compile("test-topic-[0-9]"),
+//      new SimpleStringSchema,
+//      properties)
+    kafkaConsumer.setStartFromGroupOffsets
+    val stream = env.addSource(kafkaConsumer)
+
+    stream.print()
 
     // execute program
     env.execute("Flink Streaming Scala API Skeleton")
