@@ -116,6 +116,7 @@ object WindowsStudy {
     val result = withTimestampsAndWatermarks
       .keyBy(_.userId)
       .window(TumblingEventTimeWindows.of(Time.seconds(3)))
+        .allowedLateness(Time.seconds(1))
       .fold(LoginEvent("0", "0.0.0.0", "default", 0L, 0),
         (acc: LoginEvent, v: LoginEvent) => LoginEvent(v.userId, v.ip, v.`type`, v.timestamp, v.cnt + acc.cnt),
         new CountProcessWindowFunction()
