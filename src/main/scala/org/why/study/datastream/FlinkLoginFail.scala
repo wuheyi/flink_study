@@ -29,10 +29,10 @@ object FlinkLoginFail {
 
 
     val loginEventStream = env.fromCollection(List(
-      new LoginEvent("1", "192.168.0.1", "fail", 100L, 1),
+      new LoginEvent("1", "192.168.0.1", "fail", 1000L, 1),
       new LoginEvent("1", "192.168.0.2", "fail", 1800L, 2),
-      new LoginEvent("1", "192.168.0.3", "fail", 3500L, 3),
-      new LoginEvent("2", "192.168.10,10", "success", 200L, 4)
+      new LoginEvent("1", "192.168.0.3", "fail", 2500L, 3),
+      new LoginEvent("2", "192.168.10,10", "fail", 200L, 4)
     ))
 
 //    loginEventStream.assignTimestampsAndWatermarks(new AscendingTimestampExtractor[LoginEvent] {
@@ -58,7 +58,7 @@ object FlinkLoginFail {
       .where(_.`type`.equals("fail"))
       .next("next")
       .where(_.`type`.equals("fail"))
-      .within(Time.seconds(3))
+      .within(Time.seconds(1))
 
     val patternStream = CEP.pattern(withTimestampsAndWatermarks, loginFailPattern)
 
